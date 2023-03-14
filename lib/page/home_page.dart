@@ -11,6 +11,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late TextEditingController _cTodo;
   final homeController = HomeController();
+  final GlobalKey<FormState> _formKey = GlobalKey();
   @override
   void initState() {
     _cTodo = TextEditingController();
@@ -64,41 +65,55 @@ class _HomePageState extends State<HomePage> {
             right: 0,
             bottom: 0,
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               width: MediaQuery.of(context).size.width,
-              height: 70,
+              height: 90,
               decoration: const BoxDecoration(color: Colors.white30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _cTodo,
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        hintText: 'Adicione uma tarefa',
-                        border: OutlineInputBorder(),
+              child: Form(
+                key: _formKey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        validator: ((value) {
+                          if (value!.isEmpty) {
+                            return 'Introduza uma tarefa';
+                          }
+                          return null;
+                        }),
+                        controller: _cTodo,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          hintText: 'Adicione uma tarefa',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      homeController.addTodo(todo: _cTodo.text);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 5),
-                      width: 50,
-                      height: 50,
-                      decoration: const BoxDecoration(
-                        color: Colors.amber,
-                        shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: () {
+                        if (_formKey.currentState!.validate()) {
+                          homeController.addTodo(todo: _cTodo.text);
+                          _cTodo.clear();
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                          left: 5,
+                        ),
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          color: Colors.amber,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.add,
-                      ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           )
